@@ -58,7 +58,6 @@ public:
     }
 };
 
-// Функции для сортировки по автору и году
 bool compareByAuthor(const Book& a, const Book& b) {
     return a.GetAuthor() < b.GetAuthor();
 }
@@ -81,18 +80,40 @@ public:
     }
 
     bool removeBook(const string& title) {
-        for (auto it = _books.begin(); it != _books.end();) {
-            if (it->GetTitle() == title) {
-                _books.erase(it);
-                cout << "Книга удалена.\n";
-                return true;
-            } else {
-                ++it;
-            }
+    vector<Book*> titleName;
+
+    for (auto& book : _books) {
+        if (book.GetTitle() == title) {
+            titleName.push_back(&book);
         }
+    }
+
+    if (titleName.empty()) {
         cout << "Книга с таким названием не найдена.\n";
         return false;
     }
+
+    cout << "Найдено несколько книг с названием \"" << title << "\":\n";
+    for (const auto& book : titleName) {
+        book->Print();
+    }
+
+    cout << "Введите ID книги для удаления: ";
+    size_t delID;
+    cin >> delID;
+
+    for (auto it = _books.begin(); it != _books.end(); ++it) {
+        if (it->GetID() == delID) {
+            _books.erase(it);
+            cout << "Книга с ID " << delID << " удалена.\n";
+            return true;
+        }
+    }
+
+    cout << "Книга с указанным ID не найдена.\n";
+    return false;
+}
+
 
     Book* findBook(const string& title) {
         for (auto& book : _books)
