@@ -1,10 +1,22 @@
 #include <algorithm>
 #include <iostream>
-#include <limits>
 #include <string>
 #include <vector>
+#include <cctype>
 
 using namespace std;
+
+bool is_digits(string& str)
+{
+    for (char ch : str) {
+        int v = ch;
+        if (!isdigit(ch)) {
+            return false;
+        }
+    }
+ 
+    return true;
+}
 
 enum class SortType { TITLE, AUTHOR, YEAR };
 
@@ -28,20 +40,45 @@ class Book {
     int GetYear() const { return _year; }
     double GetPrice() const { return _price; }
 
-    void Print() {
-        cout << "ID книги: " << _id << "Название: " << _title
+    void Print() const {
+        cout << "ID книги: " << _id << " Название: " << _title
              << ", Автор: " << _author << ", Год: " << _year
              << ", Цена: " << _price << " руб." << endl;
     }
+
+    bool operator<(const Book& other) const { return _title < other._title; }
+
+    bool operator>(const Book& other) const { return _title > other._title; }
+
+    bool operator==(const Book& other) const {
+        return _title == other._title && _author == other._author &&
+               _year == other._year && _price == other._price;
+    }
 };
+
+bool compareByAuthor(const Book& a, const Book& b) {
+    return a.GetAuthor() < b.GetAuthor();
+}
+
+bool compareByYear(const Book& a, const Book& b) {
+    return a.GetYear() < b.GetYear();
+}
+
 
 
 class BookStore {
   private:
     vector<Book> _books;
+    static size_t ID;
 
   public:
-    void addBook(const Book& book) { _books.push_back(book); }
+
+    BookStore() { ID = 1; }
+    
+    void addBook(const Book& book) { 
+        _books.push_back(Book(ID, book.GetAuthor(), book.GetTitle(), book.GetYear(), book.GetPrice())); 
+        ID++;
+    }
 
     void removeBook(const string& title) {
         for (auto it = _books.begin(); it < _books.end();) {
@@ -53,46 +90,79 @@ class BookStore {
     }
 
     Book* findBook(const string& title) {
-        for (auto it = _books.begin(); it < _books.end();)
+        for (auto it = _books.begin(); it < _books.end(); it++)
             if (it->GetTitle() == title) return &(*it);
         return nullptr;
     }
 
-    void listsBook() {
-        for (int i = 0; i < _books.size(); i++) {
-            _books[i].Print();
+    void listBooks(SortType sortType) {
+        switch (sortType) {
+            case SortType::TITLE:
+                sort(_books.begin(), _books.end());
+                break;
+            case SortType::AUTHOR:
+                sort(_books.begin(), _books.end(), compareByAuthor);
+            case SortType::YEAR:
+                sort(_books.begin(), _books.end(), compareByYear);
+            default:
+                cout << "Неподходящий параметр.\n";
+                break;
         }
-        
+
+        for (const auto& book : _books) book.Print();
     }
 
+    vector<Book> findBookInRangePrice(double minPrice, double maxPrice) {
+        vector<Book> result;
+        for (auto it = _books.begin(); it < _books.end(); it++) {
+            if (it->GetPrice() >= minPrice && it->GetPrice() <= maxPrice) {
+                result.push_back(*it);
+            }
+        }
+        return result;
+    }
 };
 
+size_t BookStore::ID = 1;
+
 void Menu() {
-    cout << "1. Добавить книгу\n"
+    cout << "\n1. Добавить книгу\n"
          << "2. Удалить книгу.\n"
          << "3. Найти книгу по названию.\n"
          << "4. Показать все книги (Отсортированные по "
             "названию/автору/году издания)\n"
          << "5. Найти все книги в ценовом диапазоне.\n"
-         << "6. Выйти.\n" << "Выберите опцию: ";
+         << "6. Выйти.\n"
+         << "Выберите опцию: ";
 }
 
 int main() {
     BookStore store;
+    string tmp;
     int choice;
 
     while (true) {
         Menu();
-        cin >> choice;
-
+        cin >> tmp;
+        if (!is_digits(tmp))
+        {
+            cout << "Неправильный ввод. Попробуйте снова.\n";
+            continue;
+        }
+        else if (tmp[0] == '\n') 
+        {
+            continue;
+        }
+        
+        choice = atoi(tmp.c_str());
         string title, author;
         int year;
         double price;
 
         switch (choice) {
-            case 1:
-                {cout << "Введите название: ";
-                cin.ignore();
+            case 1: {
+                cout << "Введите название: ";
+                cin.ignore(1, '\n');
                 getline(cin, title);
                 cout << "Введите автора: ";
                 getline(cin, author);
@@ -100,20 +170,20 @@ int main() {
                 cin >> year;
                 cout << "Введите цену: ";
                 cin >> price;
-                store.addBook(Book(1, title, author, year, price));
-                cout << "Книга добавлена.\n";}
-                break;
+                store.addBook(Book(0, title, author, year, price));
+                cout << "Книга добавлена.\n";
+            } break;
 
-            case 2:
-              {  cout << "Введите название книги для удаления: ";
+            case 2: {
+                cout << "Введите название книги для удаления: ";
                 cin.ignore(1, '\n');
                 getline(cin, title);
                 store.removeBook(title);
-                cout << "Книга удалена.\n";}
-                break;
+                cout << "Книга удалена.\n";
+            } break;
 
-            case 3:
-                {cout << "Введите название книги для поиска: ";
+            case 3: {
+                cout << "Введите название книги для поиска: ";
                 cin.ignore(1, '\n');
                 getline(cin, title);
                 Book* book = store.findBook(title);
@@ -121,13 +191,26 @@ int main() {
                     book->Print();
                 } else {
                     cout << "Книга не найдена.\n";
-                }}
-                break;
+                }
+            } break;
 
-            case 4:
-                store.listsBook();
-                break;
+            case 4: {
+                int sortOption;
+                cout << "Сортировать по: 1. Названию, 2. Автору, 3. Году "
+                        "издания\n";
+                cin >> sortOption;
+                store.listBooks((SortType)(sortOption - 1));
+            } break;
 
+            case 5: {
+                double minPrice, maxPrice;
+                cout << "Введите минимальную цену: ";
+                cin >> minPrice;
+                cout << "ВВедите максимальную цену: ";
+                cin >> maxPrice;
+                auto books = store.findBookInRangePrice(minPrice, maxPrice);
+                for (const auto& book : books) book.Print();
+            } break;
             case 6:
                 cout << "Выход из программы.\n";
                 return 0;
