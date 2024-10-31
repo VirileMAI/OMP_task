@@ -143,14 +143,15 @@ int main() {
 
     while (true) {
         Menu();
-        cin >> tmp;
+        getline(cin, tmp);
+
+        if (tmp.empty()) 
+        {
+            continue;
+        }
         if (!is_digits(tmp))
         {
             cout << "Неправильный ввод. Попробуйте снова.\n";
-            continue;
-        }
-        else if (tmp[0] == '\n') 
-        {
             continue;
         }
         
