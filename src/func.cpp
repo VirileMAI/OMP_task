@@ -121,6 +121,7 @@ void loop(BookStore& store) {
             case 3: {
                 wcout << L"Введите название книги для поиска: ";
                 getline(wcin, title);
+                wcout << endl;
                 Book* book = store.findBook(title);
                 if (book) {
                     book->Print();
@@ -135,6 +136,7 @@ void loop(BookStore& store) {
                          L"издания\n";
                 wcin >> sortOption;
                 wcin.ignore(numeric_limits<streamsize>::max(), L'\n');
+                wcout << endl;
                 store.listBooks(static_cast<SortType>(sortOption - 1));
             } break;
 
@@ -151,7 +153,7 @@ void loop(BookStore& store) {
                 minPrice = stod(tmpMin);
                 wcout << L"Введите максимальную цену: ";
                 getline(wcin, tmpMax);
-                cout << endl;
+                wcout << endl;
                 if (!is_number(tmpMax) || stod(tmpMax) < 0 ||
                     stod(tmpMax) > numeric_limits<int>::max()) {
                     wcout << L"\nВведена некорректная цена.\n";
