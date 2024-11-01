@@ -19,7 +19,6 @@ class Book {
     Book(size_t id, const wstring& title, const wstring& author, short year,
          double price);
 
-
     size_t GetID() const;
     const wstring& GetTitle() const;
     const wstring& GetAuthor() const;

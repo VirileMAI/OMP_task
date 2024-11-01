@@ -85,7 +85,7 @@ void BookStore::listBooks(SortType sortType) {
             sort(_books.begin(), _books.end(), compareByYear);
             break;
         default:
-            wcout << L"Неподходящий параметр.\n";
+            wcout << L"\nНеподходящий параметр.\n";
             return;
     }
     for (const auto& book : _books) book.Print();

@@ -12,7 +12,9 @@
 
 using namespace std;
 
-bool is_digits(const wstring& str);
+bool is_number(const wstring& str);
+
+bool is_digits(const std::wstring& str);
 
 bool is_not_alphas(const std::wstring& str);
 
@@ -22,6 +24,6 @@ bool compareByAuthor(const Book& a, const Book& b);
 
 bool compareByYear(const Book& a, const Book& b);
 
-void loop(BookStore &store);
+void loop(BookStore& store);
 
 #endif

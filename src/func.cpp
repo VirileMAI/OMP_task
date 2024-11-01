@@ -2,7 +2,7 @@
 
 #include "class.h"
 
-bool is_digits(const wstring& str) {
+bool is_number(const wstring& str) {
     int all = 0;
     bool dot = false;
 
@@ -21,6 +21,15 @@ bool is_digits(const wstring& str) {
     return all > 0;
 }
 
+bool is_digits(const wstring& str) {
+    for (wchar_t ch : str) {
+        if (!iswdigit(ch)) {
+            return false;
+        }
+    }
+    return true;
+}
+
 bool is_not_alphas(const std::wstring& str) {
     int all = 0;
     for (wchar_t ch : str) {
@@ -33,7 +42,8 @@ void Menu() {
     wcout << L"\n1. Добавить книгу\n"
           << L"2. Удалить книгу\n"
           << L"3. Найти книгу по названию\n"
-          << L"4. Показать все книги (сортировка по названию/автору/году издания)\n"
+          << L"4. Показать все книги (сортировка по названию/автору/году "
+             L"издания)\n"
           << L"5. Найти книги в ценовом диапазоне\n"
           << L"6. Выйти\n"
           << L"Выберите опцию: ";
@@ -82,7 +92,7 @@ void loop(BookStore& store) {
 
                 wcout << L"Введите год издания: ";
                 getline(wcin, tmpYear);
-                if (!is_digits(tmpYear) || tmpYear.empty() ||
+                if (!is_number(tmpYear) || tmpYear.empty() ||
                     stoi(tmpYear) < 1 || stoi(tmpYear) > 2024) {
                     wcout << L"\nНекорректный ввод даты.\n";
                     break;
@@ -91,7 +101,7 @@ void loop(BookStore& store) {
 
                 wcout << L"Введите цену: ";
                 getline(wcin, tmpPrice);
-                if (!is_digits(tmpPrice) || tmpPrice.empty() ||
+                if (!is_number(tmpPrice) || tmpPrice.empty() ||
                     stod(tmpPrice) < 0 ||
                     stod(tmpPrice) > numeric_limits<int>::max()) {
                     wcout << L"\nНекорректный ввод цены.\n";
@@ -133,7 +143,7 @@ void loop(BookStore& store) {
                 double minPrice, maxPrice;
                 wcout << L"Введите минимальную цену: ";
                 getline(wcin, tmpMin);
-                if (!is_digits(tmpMin) || stod(tmpMin) < 0 ||
+                if (!is_number(tmpMin) || stod(tmpMin) < 0 ||
                     stod(tmpMin) > numeric_limits<int>::max()) {
                     wcout << L"\nВведена некорректная цена.\n";
                     break;
@@ -141,7 +151,8 @@ void loop(BookStore& store) {
                 minPrice = stod(tmpMin);
                 wcout << L"Введите максимальную цену: ";
                 getline(wcin, tmpMax);
-                if (!is_digits(tmpMax) || stod(tmpMax) < 0 ||
+                cout << endl;
+                if (!is_number(tmpMax) || stod(tmpMax) < 0 ||
                     stod(tmpMax) > numeric_limits<int>::max()) {
                     wcout << L"\nВведена некорректная цена.\n";
                     break;

@@ -1,6 +1,6 @@
 TARGET = Bookstore
 CC = g++
-SRC = Bookstore.cpp func.cpp class.cpp
+SRC = src/Bookstore.cpp src/func.cpp src/class.cpp
 
 all: clean $(TARGET)
 
@@ -11,4 +11,4 @@ clean:
 	rm -rf $(TARGET)
 
 format:
-	clang-format -i *.cpp
+	clang-format -i src/*.cpp src/*.h
