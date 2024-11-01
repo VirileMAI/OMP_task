@@ -8,10 +8,22 @@
 using namespace std;
 
 bool is_digits(const wstring& str) {
+    int all = 0;
+    bool dot = false;
+
     for (wchar_t ch : str) {
-        if (!iswdigit(ch)) return false;
+        if (iswdigit(ch)) {
+            all++;
+        } else if (ch == L'.') {
+            if (dot) {
+                return false;
+            }
+            dot = true;
+        } else {
+            return false; 
+        }
     }
-    return true;
+    return all > 0;
 }
 
 bool is_not_alphas(const std::wstring& str) {
@@ -45,7 +57,7 @@ class Book {
     double GetPrice() const { return _price; }
 
     void Print() const {
-        wcout << L"ID книги: " << _id << L" Название: " << _title
+        wcout << L"ID книги: " << _id << L", Название: " << _title
               << L", Автор: " << _author << L", Год: " << _year << L", Цена: "
               << _price << L" руб." << endl;
     }
@@ -89,7 +101,7 @@ class BookStore {
         }
 
         if (titleName.empty()) {
-            wcout << L"Книга с таким названием не найдена.\n";
+            wcout << L"\nКнига с таким названием не найдена.\n";
             return false;
         }
 
@@ -195,7 +207,7 @@ int main() {
                 getline(wcin, author);
 
                 if (is_not_alphas(author)) {
-                    wcout << L"Некорректное имя автора, могут быть только "
+                    wcout << L"\nНекорректное имя автора, могут быть только "
                              L"буквы.\n";
                     break;
                 }
@@ -204,7 +216,7 @@ int main() {
                 getline(wcin, tmpYear);
                 if (!is_digits(tmpYear) || tmpYear.empty() ||
                     stoi(tmpYear) < 1 || stoi(tmpYear) > 2024) {
-                    wcout << L"Некорректный ввод даты.\n";
+                    wcout << L"\nНекорректный ввод даты.\n";
                     break;
                 }
                 year = stoi(tmpYear);
@@ -214,12 +226,12 @@ int main() {
                 if (!is_digits(tmpPrice) || tmpPrice.empty() ||
                     stoi(tmpPrice) < 0 ||
                     stoi(tmpPrice) > numeric_limits<int>::max()) {
-                    wcout << L"Некорректный ввод цены.\n";
+                    wcout << L"\nНекорректный ввод цены.\n";
                     break;
                 }
                 price = stoi(tmpPrice);
                 store.addBook(Book(0, title, author, year, price));
-                wcout << L"Книга добавлена.\n";
+                wcout << L"\nКнига добавлена.\n";
             } break;
 
             case 2: {
@@ -235,7 +247,7 @@ int main() {
                 if (book) {
                     book->Print();
                 } else {
-                    wcout << L"Книга не найдена.\n";
+                    wcout << L"\nКнига не найдена.\n";
                 }
             } break;
 
@@ -253,23 +265,28 @@ int main() {
                 double minPrice, maxPrice;
                 wcout << L"Введите минимальную цену: ";
                 getline(wcin, tmpMin);
-                if (!is_digits(tmpMin) || stoi(tmpMin) < 0 ||
-                    stoi(tmpMin) > numeric_limits<int>::max()) {
-                    wcout << L"Введена некорректная цена.\n";
+                if (!is_digits(tmpMin) || stod(tmpMin) < 0 ||
+                    stod(tmpMin) > numeric_limits<int>::max()) {
+                    wcout << L"\nВведена некорректная цена.\n";
                     break;
                 }
-                minPrice = stoi(tmpMin);
+                minPrice = stod(tmpMin);
                 wcout << L"Введите максимальную цену: ";
                 getline(wcin, tmpMax);
-                if (!is_digits(tmpMax) || stoi(tmpMax) < 0 ||
-                    stoi(tmpMax) > numeric_limits<int>::max()) {
-                    wcout << L"Введена некорректная цена.\n";
+                if (!is_digits(tmpMax) || stod(tmpMax) < 0 ||
+                    stod(tmpMax) > numeric_limits<int>::max()) {
+                    wcout << L"\nВведена некорректная цена.\n";
                     break;
                 }
-                maxPrice = stoi(tmpMax);
+                maxPrice = stod(tmpMax);
+                if (maxPrice < minPrice) {
+                    wcout << L"\nМаксимальная цена должна быть больше "
+                            "минимальной.\n";
+                    break;
+                }
                 auto books = store.findBookInRangePrice(minPrice, maxPrice);
                 if (books.empty())
-                    wcout << L"Нет книг в таком ценовом диапазоне.\n";
+                    wcout << L"\nНет книг в таком ценовом диапазоне.\n";
                 for (const auto& book : books) book.Print();
             } break;
 
@@ -278,7 +295,7 @@ int main() {
                 return 0;
 
             default:
-                wcout << L"Неверный выбор. Попробуйте снова.\n";
+                wcout << L"\nНеверный выбор. Попробуйте снова.\n";
                 break;
         }
     }
