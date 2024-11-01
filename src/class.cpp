@@ -46,7 +46,7 @@ bool BookStore::removeBook(const wstring& title) {
         return false;
     }
 
-    wcout << L"Найдено несколько книг с названием \"" << title << L"\":\n";
+    wcout << L"\nНайдено несколько книг с названием \"" << title << L"\":\n";
     for (const auto& book : titleName) {
         book->Print();
     }
